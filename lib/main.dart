@@ -2,17 +2,12 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(
-    MaterialApp(
-       title: "Shape",
-       home: Shape()
-    ),
+    const MaterialApp(title: 'Shape', home: Shape()),
   );
 }
 
 class Shape extends StatefulWidget {
-  const Shape({Key key}) : super(key: key);
-
- // cube.isValidType();
+  const Shape({Key? key}) : super(key: key);
 
   @override
   _ShapeState createState() => _ShapeState();
@@ -20,120 +15,107 @@ class Shape extends StatefulWidget {
 
 class _ShapeState extends State<Shape> {
 
-
-  //de ce utilizarea codului aici arunca eroarea
-  // Cube _cube = new Cube(number:4);
-  //   _cube.isValidShape();
-  //22:3: Error: The name of a constructor must match the name of the enclosing class.
-  //17:32: Error: Method not found: '_ShapeState'.
   @override
   Widget build(BuildContext context) {
-    //de ce aici e ok?
-    //Cube _cube = new Cube(number:4);
 
-    TextEditingController _controller = TextEditingController();
+    final TextEditingController _controller = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Number shapes')
-
-      ),
+      appBar: AppBar(title: const Text('Number shapes')),
       body: Column(
-        children: [
-          Text('Pleas input some number to see if it is square or triangular'),
+        children: <Widget>[
+          const Text('Pleas input some number to see if it is square or triangular'),
           TextFormField(
             controller: _controller,
-            ),
-          ],
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-           String validate = validateInput(_controller.text);
-           if( null != validate) {
-             showDialog(context: context,
-                 builder: (BuildContext context) => AlertDialog(
-                  title: Text("$validate"),
-                  actions: [
-                     TextButton(
-                        onPressed: () {
-                          Navigator.pop(context, 'Cancel');
-                          _controller.clear();
-                        },
-                        child: Text('Try again'),
-                      ),
-                    ]
-               ),
-             );
-           }else{
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          final bool validate = validateInput(_controller.text);
 
-             int _number =  num.parse(_controller.text);
-              Cube _cube = Cube(number: _number);
-               Triangle _triangle = Triangle(number: _number);
-              bool _isCube = _cube.isValidShape();
-              bool _isTriangle = _triangle.isValidShape();
-              print(_isTriangle);
-              String _message = checkShape(_isCube, _isTriangle, _number);
+          if (validate != true) {
+            showDialog<void>(
+              context: context,
+              builder: (BuildContext context) =>
+                  AlertDialog(title: const Text('Please use only numbers'), actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, 'Cancel');
+                    _controller.clear();
+                  },
+                  child: const Text('Try again'),
+                ),
+              ]),
+            );
+          }
 
-              showDialog(context: context,
-               builder: (BuildContext context) => AlertDialog(
-                   title: Text("$_message"),
-                   actions: [
-                     TextButton(
-                       onPressed: () {
-                         Navigator.pop(context, 'Cancel');
-                         _controller.clear();
-                       },
-                       child: Text('Try again'),
-                     ),
-                   ]
-               ),
-             );
-           };
+          if (validate == true) {
+            final int _number = int.parse(_controller.text);
+            final Cube _cube = Cube(number: _number);
+            final Triangle _triangle = Triangle(number: _number);
+            final bool _isCube = _cube.isValidShape();
+            final bool _isTriangle = _triangle.isValidShape();
+            final String _message = checkShape(_isCube, _isTriangle, _number);
+
+            showDialog<void>(
+              context: context,
+              builder: (BuildContext context) => AlertDialog(title: Text(_message), actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context, 'Cancel');
+                    _controller.clear();
+                  },
+                  child: const Text('Try again'),
+                ),
+              ]),
+            );
+          }
         },
       ),
     );
   }
 }
 
-String checkShape(bool cube, bool triangle, number)
-{
-  if((cube == true) && (triangle == true)) {
-    return "Number $number is triangle and cube";
-  }else if( (cube == false) && (triangle == true) ){
-    return "Number $number is triangle";
-  }else if( (cube == true) && (triangle == false)){
-    return "Number $number is cube";
-  }else if( (cube == false) && (triangle == false)){
-    return "Number $number is neither cube or triangle";
-  }else{
-    return "Nasty logic with nasty results happened";
+String checkShape(bool cube, bool triangle, int number) {
+  if ((cube == true) && (triangle == true)) {
+    return 'Number $number is triangle and cube';
+  } else if ((cube == false) && (triangle == true)) {
+    return 'Number $number is triangle';
+  } else if ((cube == true) && (triangle == false)) {
+    return 'Number $number is cube';
+  } else if ((cube == false) && (triangle == false)) {
+    return 'Number $number is neither cube or triangle';
+  } else {
+    return 'Nasty logic with nasty results happened';
   }
 }
 
-
-String validateInput(String value) {
-  final number = num.tryParse(value);
-  if(value.isEmpty || number == null) {
-    return 'Please use only numbers';
+bool validateInput(String value) {
+  final num? number = num.tryParse(value);
+  if ((value.isNotEmpty) || (number != null)) {
+    return true;
   }
-  return null;
+  return false;
 }
 
-
-abstract class GeometricShape{
-   isValidShape();
+abstract class GeometricShape {
+  bool isValidShape();
 }
 
 class Cube implements GeometricShape {
+  Cube({required this.number});
+
   int number;
   int _counter = 0;
   int _product = 0;
-  Cube({this.number});
 
+  @override
   bool isValidShape() {
-    while(_product < number) {
+    while (_product < number) {
       _product = _counter * _counter * _counter;
       _counter++;
-      if(_product == number) {
+      if (_product == number) {
         return true;
       }
     }
@@ -142,18 +124,19 @@ class Cube implements GeometricShape {
 }
 
 class Triangle implements GeometricShape {
+  Triangle({required this.number});
+
   int number;
   int _counter = 0;
   int _sum = 0;
 
-  Triangle({this.number});
-
-  bool isValidShape(){
-    while(_sum < number) {
-        this._sum = _sum + (_counter +1);
-        ++_counter;
-        print(_sum);
-      if(_sum == number) {
+  @override
+  bool isValidShape() {
+    while (_sum < number) {
+      _sum = _sum + (_counter + 1);
+      ++_counter;
+      print(_sum);
+      if (_sum == number) {
         return true;
       }
     }

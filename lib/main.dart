@@ -14,10 +14,8 @@ class Shape extends StatefulWidget {
 }
 
 class _ShapeState extends State<Shape> {
-
   @override
   Widget build(BuildContext context) {
-
     final TextEditingController _controller = TextEditingController();
 
     return Scaffold(
